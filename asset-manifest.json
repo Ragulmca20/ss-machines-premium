@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/ss-machines-premium/static/css/main.7137c37b.css",
+    "main.js": "/ss-machines-premium/static/js/main.202f878e.js",
+    "static/js/787.cd94c771.chunk.js": "/ss-machines-premium/static/js/787.cd94c771.chunk.js",
+    "index.html": "/ss-machines-premium/index.html",
+    "main.7137c37b.css.map": "/ss-machines-premium/static/css/main.7137c37b.css.map",
+    "main.202f878e.js.map": "/ss-machines-premium/static/js/main.202f878e.js.map",
+    "787.cd94c771.chunk.js.map": "/ss-machines-premium/static/js/787.cd94c771.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7137c37b.css",
+    "static/js/main.202f878e.js"
+  ]
+}
