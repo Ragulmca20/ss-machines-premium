@@ -1,0 +1,10 @@
+.centered-container {
+  display: flex;
+  padding-top: 10%;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}

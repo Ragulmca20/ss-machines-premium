@@ -1,0 +1,9 @@
+.chart {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    max-width: 80%;
+    max-height: 80%;
+    margin: auto;
+  }
+  
