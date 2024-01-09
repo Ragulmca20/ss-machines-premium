@@ -1,0 +1,29 @@
+.custom-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 16px;
+    width: 400px;
+    transition: transform 0.3s;
+    text-align: center;
+  }
+  
+  .custom-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .card-content {
+    padding: 16px;
+  }
+  
+  .card-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .card-description {
+    font-size: 14px;
+    color: #555;
+  }
+  
