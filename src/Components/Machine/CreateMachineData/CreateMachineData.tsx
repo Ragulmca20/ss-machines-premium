@@ -26,11 +26,12 @@ const CreateMachineData: React.FC<CreateMachineDataProps> = () => {
       return;
     }
     if (file) {
+      const userDetails = localStorage.getItem("user");
       addMachineData({
         machineValue1: machineValue1.current,
         machineValue2: machineValue2.current,
         file,
-        userId:"current user"
+        userId:userDetails,
       });
     }
   };

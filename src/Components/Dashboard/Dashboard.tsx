@@ -26,6 +26,8 @@ interface MachineData {
   userId: string;
 }
 const Dashboard: React.FC = () => {
+  // const userDetails = localStorage.getItem("user");
+  // console.log(userDetails&& userDetails["uid"]);
   // Sample data for the table
   const machineData: MachineData[] = [];
   const [tableData, setMachineData] = useState<MachineData[]>(machineData)

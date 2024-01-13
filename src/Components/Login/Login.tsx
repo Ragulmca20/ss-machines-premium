@@ -5,8 +5,14 @@ import { login, signup } from "../../Firebase/user";
 import { useLocation } from "react-router-dom";
 import Card from "../../UI/Card/Card";
 import Container from "../../UI/Container/Container";
+import { useSelector } from "react-redux";
+import { RootState } from "../../Store/store";
 const loginRoute = "/login";
 const Login: React.FC = () => {
+  const user = useSelector((state:RootState )=>{
+    return state.auth;
+  });
+  console.log(user);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -28,8 +34,8 @@ const Login: React.FC = () => {
         email: formData?.email,
         password: formData?.password,
       });
-      const user = userCredential.user;
-      console.log("Login success!", user.displayName);
+      const user = {"uid":userCredential.user.uid};
+      localStorage.setItem("user",JSON.stringify(user));
     } catch (error: { message: string } | any) {
       console.error("Login error:", error?.message);
       setIsLoginFailed(true);
