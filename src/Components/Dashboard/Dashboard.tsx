@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Role } from "../../Store/Auth/AuthSlice";
 import TableWithSkeletonLoader from "../../UI/Table Skeleton/TableSkeletonLoader";
 import { dashboardActions } from "../../Store/Dashboard/DashboardSlice";
+import CircularProgressCentered from "../../UI/Loader/Loader";
 Chart.register(...registerables);
 interface MachineData {
   filePath: string;
@@ -30,14 +31,15 @@ interface MachineData {
   userId: string;
 }
 const Dashboard: React.FC = () => {
-  const {machineData, isAdmin, isLoading} = useSelector((state:any) =>{
-    return {machineData:state.dashboard.dashboard,
-      isAdmin:state.auth.user.role === Role.admin,
-      isLoading: state.dashboard.isLoading
+  const { machineData, isAdmin, isLoading,isAuthenticated } = useSelector((state: any) => {
+    return {
+      machineData: state.dashboard.dashboard,
+      isAdmin: state.auth.user.role === Role.admin,
+      isLoading: state.dashboard.isLoading,
+      isAuthenticated: state.auth.isAuthenticated
     }
   });
-  const [tableData, setMachineData] = useState<MachineData[]>(machineData)
-  
+  const [tableData, setMachineData] = useState<MachineData[]>(machineData);
   // Sample data for the charts
   const chartData = {
     labels: ["Category 1", "Category 2", "Category 3"],
@@ -92,9 +94,8 @@ const Dashboard: React.FC = () => {
     });
 
   }, []);
-
-  return (
-    <Container className={"container"}>
+  const getDashboard = () => {
+    return (<Container className={"container"}>
       <div className={"dashboard"}>
         <TableContainer className="table"
           component={Paper}
@@ -102,13 +103,13 @@ const Dashboard: React.FC = () => {
           <Table stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell>Machine Input 1</TableCell>
-                <TableCell>Machine Input 2</TableCell>
-                <TableCell>File URL</TableCell>
+                <TableCell style={{ fontWeight: "550", fontFamily: "Arial" }}>Machine Input 1</TableCell>
+                <TableCell style={{ fontWeight: "550", fontFamily: "Arial" }}>Machine Input 2</TableCell>
+                <TableCell style={{ fontWeight: "550", fontFamily: "Arial" }}>File URL</TableCell>
               </TableRow>
             </TableHead>
             <TableBody style={{ overflowY: 'auto' }} >
-              {isLoading ? (<TableWithSkeletonLoader row={6} column={3}/>):tableData.map((row) => (
+              {isLoading ? (<TableWithSkeletonLoader row={6} column={3} />) : tableData.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell>{row.machineValue1}</TableCell>
                   <TableCell>{row.machineValue2}</TableCell>
@@ -132,7 +133,10 @@ const Dashboard: React.FC = () => {
       <div style={{ width: "50%", display: "flex", justifyContent: "center" }}>
         <TabComponent tabs={tabs} activeTabIndex={activeTabIndex} handleTabChange={handleTabChange} />
       </div>
-    </Container>
+    </Container>);
+  }
+  return (
+    isAuthenticated?getDashboard():<CircularProgressCentered/>
   );
 };
 

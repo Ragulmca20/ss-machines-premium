@@ -8,6 +8,7 @@ import store from "./Store/store";
 import { Provider } from "react-redux";
 import Home from "./Components/Home/Home";
 import PrivateRoute from "./Route/PrivateRoute";
+import Login from "./Components/Login/Login";
 
 const App: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const App: React.FC = () => {
               <Dashboard />
             </PrivateRoute>
           } />
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<Home />} />
           <Route path="/admin" element={
             <PrivateRoute>

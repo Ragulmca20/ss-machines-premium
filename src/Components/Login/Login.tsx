@@ -1,17 +1,24 @@
 // src/components/Login.tsx
 import React, { useState } from "react";
 import { Button, TextField, Typography, Modal, Link } from "@mui/material";
-import { login, signup } from "../../Firebase/user";
+import { login, signOut, signup } from "../../Firebase/user";
 import Card from "../../UI/Card/Card";
 import Container from "../../UI/Container/Container";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../../Store/Auth/AuthSlice";
 import { dashboardActions } from "../../Store/Dashboard/DashboardSlice";
+import { useNavigate } from "react-router";
+import CircularProgressCentered from "../../UI/Loader/Loader";
+import { State } from "@popperjs/core";
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
+  const { isLoading } = useSelector((state: any) => {
+    return { isLoading: state.dashboard.isLoading }
+  })
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [isLoginFailed, setIsLoginFailed] = useState(false);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,10 +40,12 @@ const Login: React.FC = () => {
       const user = { "uid": userCredential.user.uid };
       localStorage.setItem("user", JSON.stringify(user));
       dispatch(authActions.login());
-
+      navigate("/")
     } catch (error: { message: string } | any) {
       console.error("Login error:", error?.message);
+      dispatch(dashboardActions.setLoadingState(false))
       setIsLoginFailed(true);
+      
     }
     finally {
       setFormData({ email: "", password: "" });
@@ -44,6 +53,7 @@ const Login: React.FC = () => {
     }
   };
   const handleSignup = async () => {
+    dispatch(dashboardActions.setLoadingState(true))
     try {
       await signup({
         email: formData?.email,
@@ -54,14 +64,16 @@ const Login: React.FC = () => {
       console.error("Signup error:", error.message);
     } finally {
       setFormData({ email: "", password: "" });
+      dispatch(dashboardActions.setLoadingState(false))
+      navigate("/")
     }
 
   };
   const handleCloseModal = () => {
     setIsLoginFailed(false);
   };
-  return (
-    <Container className={"centered-container"}>
+  const getLoginContainer = () => {
+    return (<Container className={"centered-container"}>
       <Card title={isLogin ? "Login" : "Signup"}>
         <form style={{ width: "100%", marginTop: "1rem" }} noValidate>
           <TextField
@@ -101,7 +113,10 @@ const Login: React.FC = () => {
             {isLogin ? "LogIn" : "Sign Up"}
           </Button>
         </form>
-        <Link style={{ cursor: 'pointer' }} onClick={() => {
+        <Link style={{ cursor: 'pointer' }} onClick={async () => {
+          if(!isLogin){
+            await signOut();
+          }
           setIsLogin(!isLogin)
         }}>{isLogin ? "New user signup" : "Already have an account"} </Link>
         {/* Error Modal */}
@@ -132,7 +147,7 @@ const Login: React.FC = () => {
               variant="contained"
               color="primary"
               onClick={handleCloseModal}
-              
+
               size="large"
               style={{
                 maxWidth: "50px",
@@ -146,8 +161,12 @@ const Login: React.FC = () => {
           </div>
         </Modal>
       </Card>
-    </Container>
-  );
+    </Container>);
+  }
+  return <>
+    {isLoading ? <CircularProgressCentered /> : getLoginContainer()}
+  </>
+
 };
 
 export default Login;

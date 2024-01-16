@@ -1,6 +1,6 @@
 // src/components/Navbar.tsx
 import React, { useEffect } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { signOut } from '../../Firebase/user';
 import { onAuthStateChanged } from '@firebase/auth';
 import auth from '../../Firebase/firebase';
-import { authActions } from '../../Store/Auth/AuthSlice';
+import { Role, authActions } from '../../Store/Auth/AuthSlice';
 
 const navbarStyles: React.CSSProperties = {
   flexGrow: 1,
@@ -24,6 +24,7 @@ const linkStyles: React.CSSProperties = {
 
 const Navbar: React.FC = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   useEffect(() => {
     onAuthStateChanged(auth, (authUser) => {
       if (authUser)
@@ -40,6 +41,7 @@ const Navbar: React.FC = () => {
   const handleLogout = async () => {
     await signOut();
     dispatch(authActions.logout());
+    navigate("/login");
   }
   return (
     <div style={navbarStyles}>
@@ -48,12 +50,17 @@ const Navbar: React.FC = () => {
           <Typography variant="h6" style={{ flexGrow: 1 }}>
             SS Premium Machines
           </Typography>
+          {!isAuthenticated && <Button color="inherit" component={RouterLink} to="/login" style={linkStyles}>
+            Login/Sign up
+          </Button>}
+          {isAuthenticated  && (
+          <>
           <Button color="inherit" component={RouterLink} to="/" style={linkStyles}>
-            {isAuthenticated ? "Home" : "Login/Sign Up"}
+            Home
           </Button>
-          {isAuthenticated && (<><Button color="inherit" component={RouterLink} to="/admin" style={linkStyles}>
+          {role === Role.admin && <Button color="inherit" component={RouterLink} to="/admin" style={linkStyles}>
             Admin
-          </Button>
+          </Button>}
             <Button color="inherit" component={RouterLink} to="/dashboard" style={linkStyles}>
               Dashboard
             </Button>

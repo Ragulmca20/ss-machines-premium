@@ -37,9 +37,6 @@ const authSlice = createSlice({
     saveUserData: (state, action) => {
       state.user = action.payload
     },
-    setAuthLoadingState:(state, action) =>{
-      state.isLoading=action.payload;
-    }
   },
 });
 

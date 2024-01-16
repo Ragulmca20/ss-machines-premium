@@ -35,7 +35,7 @@ const CreateMachineData: React.FC<CreateMachineDataProps> = () => {
   };
   return (
     <Container className={"centered-container"}>
-      <Card title={"Create Machine Data"}>
+      <Card title={"Add Machine Data"}>
         <TextField
           label="Text Field 1"
           fullWidth

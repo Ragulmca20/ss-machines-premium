@@ -19,12 +19,9 @@ const Home = () => {
     }
     const getPageData = () => {
         return <>
-
             {isAuthenticated && <CreateMachineData />}
-            {!isAuthenticated && <Login />}
         </>
     }
-    // console.log(isLoading);
     return (<>
         {isLoading ? <CircularProgressCentered /> : getPageData()}
 

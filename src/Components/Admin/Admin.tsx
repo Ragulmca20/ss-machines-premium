@@ -82,37 +82,37 @@ const AdminComponent = () => {
           <Table stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Read/Write</TableCell>
-                <TableCell>Grant/Revoke</TableCell>
-                <TableCell>Api Key</TableCell>
+                <TableCell style={{ fontWeight: "550", fontFamily:"Arial" }}>Email</TableCell>
+                <TableCell style={{ fontWeight: "550", fontFamily:"Arial" }}>Role</TableCell>
+                <TableCell style={{ fontWeight: "550", fontFamily:"Arial" }}>Read/Write</TableCell>
+                <TableCell style={{ fontWeight: "550", fontFamily:"Arial" }}>Grant/Revoke</TableCell>
+                <TableCell style={{ fontWeight: "550", fontFamily:"Arial" }}>Api Key</TableCell>
               </TableRow>
             </TableHead>
             <TableBody style={{ overflowY: 'auto' }}>
-              {isLoading ? (<TableWithSkeletonLoader row={4} column={5} />) : 
-              filteredUsers.map((user: any) => (
-                (<TableRow key={user.email} >
-                  <TableCell >{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell><FormControlLabel
-                    control={<Checkbox checked={user.isReadOnly} onChange={e => handleChange(e, user.id)} />}
-                    label="Read Only"
-                  /></TableCell>
-                  <TableCell align='center'>
-                    {user.hasAccess ? (
-                      <Button variant="contained" color="secondary" onClick={() => handleRevokeAccess(user.id)}>
-                        Revoke
-                      </Button>
-                    ) : (
-                      <Button variant="contained" color="primary" onClick={() => handleGiveAccess(user.id)}>
-                        Grant
-                      </Button>
-                    )}
-                  </TableCell>
-                  <TableCell>{user.id}</TableCell>
-                </TableRow>)
-              ))}
+              {isLoading ? (<TableWithSkeletonLoader row={4} column={5} />) :
+                filteredUsers.map((user: any) => (
+                  (<TableRow key={user.email} >
+                    <TableCell >{user.email}</TableCell>
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell><FormControlLabel
+                      control={<Checkbox checked={user.isReadOnly} onChange={e => handleChange(e, user.id)} />}
+                      label="Read Only"
+                    /></TableCell>
+                    <TableCell align='center'>
+                      {user.hasAccess ? (
+                        <Button variant="contained" color="secondary" onClick={() => handleRevokeAccess(user.id)}>
+                          Revoke
+                        </Button>
+                      ) : (
+                        <Button variant="contained" color="primary" onClick={() => handleGiveAccess(user.id)}>
+                          Grant
+                        </Button>
+                      )}
+                    </TableCell>
+                    <TableCell>{user.id}</TableCell>
+                  </TableRow>)
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
