@@ -5,10 +5,23 @@ import { RootState } from '../store';
 
 interface AuthState {
   isAuthenticated: boolean;
+  user: User,
+  isLoading:boolean;
 }
-
+export enum Role {
+  admin = "Admin",
+  user = "User"
+}
+export interface User {
+  id: string,
+  email: string,
+  role: Role;
+  isReadonly: boolean;
+}
 const initialState: AuthState = {
   isAuthenticated: false,
+  user: { id: "", email: "", role: Role.user, isReadonly: false },
+  isLoading:false
 };
 
 const authSlice = createSlice({
@@ -21,6 +34,12 @@ const authSlice = createSlice({
     logout: (state) => {
       state.isAuthenticated = false;
     },
+    saveUserData: (state, action) => {
+      state.user = action.payload
+    },
+    setAuthLoadingState:(state, action) =>{
+      state.isLoading=action.payload;
+    }
   },
 });
 

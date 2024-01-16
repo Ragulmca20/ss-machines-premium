@@ -17,6 +17,10 @@ import { getMachineData } from "../../Firebase/machine";
 import Container from "../../UI/Container/Container";
 import "./Dashboard.css";
 import TabComponent from "../../UI/Tab/Tab";
+import { useDispatch, useSelector } from "react-redux";
+import { Role } from "../../Store/Auth/AuthSlice";
+import TableWithSkeletonLoader from "../../UI/Table Skeleton/TableSkeletonLoader";
+import { dashboardActions } from "../../Store/Dashboard/DashboardSlice";
 Chart.register(...registerables);
 interface MachineData {
   filePath: string;
@@ -26,11 +30,14 @@ interface MachineData {
   userId: string;
 }
 const Dashboard: React.FC = () => {
-  // const userDetails = localStorage.getItem("user");
-  // console.log(userDetails&& userDetails["uid"]);
-  // Sample data for the table
-  const machineData: MachineData[] = [];
+  const {machineData, isAdmin, isLoading} = useSelector((state:any) =>{
+    return {machineData:state.dashboard.dashboard,
+      isAdmin:state.auth.user.role === Role.admin,
+      isLoading: state.dashboard.isLoading
+    }
+  });
   const [tableData, setMachineData] = useState<MachineData[]>(machineData)
+  
   // Sample data for the charts
   const chartData = {
     labels: ["Category 1", "Category 2", "Category 3"],
@@ -57,7 +64,6 @@ const Dashboard: React.FC = () => {
       label: "Bar Chart",
       content: (
         <div >
-          <Typography variant="h6">Bar Chart</Typography>{" "}
           <Bar data={chartData} />
         </div>
       ),
@@ -66,33 +72,34 @@ const Dashboard: React.FC = () => {
       label: "Pie Chart",
       content: (
         <div >
-          <Typography variant="h6">Pie Chart</Typography>
           <Doughnut data={chartData} />
         </div>
       ),
     },
   ];
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const handleTabChange = (event: React.SyntheticEvent, newIndex:number) => {
+  const handleTabChange = (event: React.SyntheticEvent, newIndex: number) => {
     setActiveTabIndex(newIndex)
   };
+  const dispatch = useDispatch();
   useEffect(() => {
+    dispatch(dashboardActions.setLoadingState(true));
     const machineData = getMachineData();
-     machineData.then(response =>{
-      setMachineData(response as unknown as MachineData[]) 
+    machineData.then(response => {
+      console.log(machineData);
+      setMachineData(response as unknown as MachineData[]);
+      dispatch(dashboardActions.setLoadingState(false));
     });
+
   }, []);
 
   return (
     <Container className={"container"}>
       <div className={"dashboard"}>
-        <Typography variant="h4">Dashboard</Typography>
-        {/* Table */}
-        <TableContainer
+        <TableContainer className="table"
           component={Paper}
-          style={{ maxHeight: "80vh", overflowY: "auto" }}
         >
-          <Table>
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell>Machine Input 1</TableCell>
@@ -100,8 +107,8 @@ const Dashboard: React.FC = () => {
                 <TableCell>File URL</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {tableData.map((row) => (
+            <TableBody style={{ overflowY: 'auto' }} >
+              {isLoading ? (<TableWithSkeletonLoader row={6} column={3}/>):tableData.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell>{row.machineValue1}</TableCell>
                   <TableCell>{row.machineValue2}</TableCell>
@@ -122,7 +129,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Bar Chart */}
-      <div style={{width:"50%", display:"flex", justifyContent:"center"}}>
+      <div style={{ width: "50%", display: "flex", justifyContent: "center" }}>
         <TabComponent tabs={tabs} activeTabIndex={activeTabIndex} handleTabChange={handleTabChange} />
       </div>
     </Container>

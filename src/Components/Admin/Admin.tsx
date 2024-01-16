@@ -1,91 +1,123 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
-  List,
-  ListItem,
-  ListItemText,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Button,
   Typography,
-  Container,
-  Paper,
-} from "@mui/material";
-import "firebase/auth";
-import { getUserDetails } from "../../Firebase/user";
-
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  Skeleton,
+} from '@mui/material';
+import { getUserDetails } from '../../Firebase/user';
+import { useDispatch, useSelector } from 'react-redux';
+import { adminActions } from '../../Store/Admin/AdminSlice';
+import { Role, User } from '../../Store/Auth/AuthSlice';
+import { dashboardActions } from '../../Store/Dashboard/DashboardSlice';
+import TableWithSkeletonLoader from '../../UI/Table Skeleton/TableSkeletonLoader';
 const AdminComponent = () => {
-  const [users, setUsers] = useState<any>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { users, role, isLoading }: { users: User[], role: Role, isLoading: boolean } = useSelector((state: any) => {
+    return {
+      users: state.admin.users,
+      role: state.auth.user.role,
+      isLoading: state.dashboard.isLoading
+    };
+  });
+  console.log(isLoading);
+  console.log(users, role)
+  const filteredUsers = isLoading ? [1, 2, 3, 4] : users.filter((user: User) => user?.email.startsWith(searchTerm));
+  console.log(filteredUsers)
+  const dispatch = useDispatch();
+
+  const handleChange = (event: any, id: string) => {
+    console.log(id);
+  };
 
   useEffect(() => {
     // Fetch the list of users from Firebase when the component mounts
+    dispatch(dashboardActions.setLoadingState(true));
     getUserDetails().then((data: any) => {
-      console.log(data);
-      setUsers((previousState: any) => [...previousState, ...data]);
+      dispatch(adminActions.setUserlist(data))
+      dispatch(dashboardActions.setLoadingState(false));
     });
   }, []);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch("/api/users"); // Replace with your server endpoint
-      const data = await response.json();
-      setUsers(data.users);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
+  const handleGiveAccess = (userId: any) => {
+    // Implement logic to give access (replace with your API call)
+    console.log(`Give access to user with ID ${userId}`);
   };
 
-  const giveAccess = async (uid: string) => {
-    try {
-      // Give access to the user using Firebase Admin SDK on your server
-      await fetch(`/api/giveAccess/${uid}`, { method: "POST" }); // Replace with your server endpoint
-      // Update the local users state
-      fetchUsers();
-    } catch (error) {
-      console.error("Error giving access:", error);
-    }
+  const handleRevokeAccess = (userId: any) => {
+    // Implement logic to revoke access (replace with your API call)
+    console.log(`Revoke access from user with ID ${userId}`);
   };
 
-  const revokeAccess = async (uid: string) => {
-    try {
-      // Revoke access from the user using Firebase Admin SDK on your server
-      await fetch(`/api/revokeAccess/${uid}`, { method: "POST" }); // Replace with your server endpoint
-      // Update the local users state
-      fetchUsers();
-    } catch (error) {
-      console.error("Error revoking access:", error);
-    }
+  const handleSearchChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+    setSearchTerm(event.target.value)
   };
 
   return (
-    <Container style={{ marginTop: "20px", height:"100vh", overflow:"scroll" }}>
-      <Paper style={{ padding: "20px" }}>
-        <Typography variant="h4" gutterBottom>
-          Admin
+    <div style={{ padding: "2rem", display: "flex", justifyContent: 'center' }}>
+      <Paper style={{ maxWidth: "80%", maxHeight: "70vh", padding: "2rem" }}>
+        <Typography variant="h6" align="center" gutterBottom>
+          User List
         </Typography>
-        <List>
-          {users.map((user: { id: string; email: string; role: string }) => (
-            <ListItem key={user.id} style={{ marginBottom: "10px" }}>
-              <ListItemText primary={`${user.email} - ${user.role}`} />
-              {user.role !== "admin" ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => giveAccess(user.id)}
-                >
-                  Give Access
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => revokeAccess(user.id)}
-                >
-                  Revoke Access
-                </Button>
-              )}
-            </ListItem>
-          ))}
-        </List>
+        <TextField
+          label="Search"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          size='small'
+
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+        <TableContainer style={{ maxHeight: '50vh' }}>
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell>Email</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Read/Write</TableCell>
+                <TableCell>Grant/Revoke</TableCell>
+                <TableCell>Api Key</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody style={{ overflowY: 'auto' }}>
+              {isLoading ? (<TableWithSkeletonLoader row={4} column={5} />) : 
+              filteredUsers.map((user: any) => (
+                (<TableRow key={user.email} >
+                  <TableCell >{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                  <TableCell><FormControlLabel
+                    control={<Checkbox checked={user.isReadOnly} onChange={e => handleChange(e, user.id)} />}
+                    label="Read Only"
+                  /></TableCell>
+                  <TableCell align='center'>
+                    {user.hasAccess ? (
+                      <Button variant="contained" color="secondary" onClick={() => handleRevokeAccess(user.id)}>
+                        Revoke
+                      </Button>
+                    ) : (
+                      <Button variant="contained" color="primary" onClick={() => handleGiveAccess(user.id)}>
+                        Grant
+                      </Button>
+                    )}
+                  </TableCell>
+                  <TableCell>{user.id}</TableCell>
+                </TableRow>)
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Paper>
-    </Container>
+    </div>
   );
 };
 

@@ -25,6 +25,9 @@ export const updateUserProfile = async (user: any) => {
     await updateProfile(user, { displayName: "admin" });
 }
 
+export const signOut =async () => {
+  await auth.signOut();
+}
 export const getUserDetails = async () => {
   try {
     const collectionRef = collection(db, "users");

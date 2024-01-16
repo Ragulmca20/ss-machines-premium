@@ -2,7 +2,7 @@ import { addDoc, collection, getDocs } from "firebase/firestore";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { db } from "./firebase";
 
-export const addMachineData = async (data:{machineValue1:any, machineValue2:any, file:any, userId:any}) =>{
+export const addMachineData = async (data:{machineValue1:string, machineValue2:string, file:File, userId:string}) =>{
         const downloadURL = await uploadfile(data.file);
         const collectionRef = collection(db, "Machine");
         try {
