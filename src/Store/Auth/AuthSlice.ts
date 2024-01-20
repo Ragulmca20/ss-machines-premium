@@ -1,6 +1,6 @@
 // authSlice.ts
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
 interface AuthState {
@@ -16,11 +16,11 @@ export interface User {
   id: string,
   email: string,
   role: Role;
-  isReadonly: boolean;
+  isReadOnly: boolean;
 }
 const initialState: AuthState = {
   isAuthenticated: false,
-  user: { id: "", email: "", role: Role.user, isReadonly: false },
+  user: { id: "", email: "", role: Role.user, isReadOnly: false },
   isLoading:false
 };
 

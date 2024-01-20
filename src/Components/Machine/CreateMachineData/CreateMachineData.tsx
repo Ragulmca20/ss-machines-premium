@@ -3,35 +3,43 @@ import { TextField, Button } from "@mui/material";
 import { addMachineData } from "../../../Firebase/machine";
 import Card from "../../../UI/Card/Card";
 import Container from "../../../UI/Container/Container";
-interface CreateMachineDataProps { }
+import { useDispatch, useSelector } from "react-redux";
+import { dashboardActions } from "../../../Store/Dashboard/DashboardSlice";
+import { selectUser } from "../../../Store/Auth/AuthSelector";
+interface CreateMachineDataProps {}
 
 const CreateMachineData: React.FC<CreateMachineDataProps> = () => {
   const [machineValue1, setMachineValue1] = useState<string>("");
   const [machineValue2, setMachineValue2] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
-
+  const userId = useSelector(selectUser).id;
+  const dispatch = useDispatch();
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setFile(event.target.files[0]);
     }
   };
-  const handleUpload = (e: any) => {
+  const handleUpload = async (e: any) => {
     e.preventDefault();
     if (file) {
-      const userDetails = localStorage.getItem("user");
-      addMachineData({
+      dispatch(dashboardActions.setLoadingState(true));
+      await addMachineData({
         machineValue1: machineValue1,
         machineValue2: machineValue2,
         file,
-        userId: userDetails||"",
+        userId: userId || "",
       });
+      dispatch(dashboardActions.setLoadingState(false));
     }
   };
   const formatFileName = (fileName?: string): string => {
     // Extract the file name without extension
     const nameWithoutExtension = fileName?.split(".").slice(0, -1).join(".");
     // Capitalize the first letter of each word
-    return nameWithoutExtension?.replace(/\b\w/g, (char) => char.toUpperCase())||"File Name";
+    return (
+      nameWithoutExtension?.replace(/\b\w/g, (char) => char.toUpperCase()) ||
+      "File Name"
+    );
   };
   return (
     <Container className={"centered-container"}>
@@ -42,7 +50,7 @@ const CreateMachineData: React.FC<CreateMachineDataProps> = () => {
           margin="normal"
           size="small"
           required
-          onChange={(e)=> setMachineValue1(e.target.value)}
+          onChange={(e) => setMachineValue1(e.target.value)}
         />
         <TextField
           label="Text Field 2"
@@ -50,7 +58,7 @@ const CreateMachineData: React.FC<CreateMachineDataProps> = () => {
           margin="normal"
           size="small"
           required
-          onChange={(e)=> setMachineValue2(e.target.value)}
+          onChange={(e) => setMachineValue2(e.target.value)}
         />
         <div
           style={{
@@ -75,10 +83,15 @@ const CreateMachineData: React.FC<CreateMachineDataProps> = () => {
             disabled
             size="small"
             variant="outlined"
-          // Any additional props or styles can be added here
+            // Any additional props or styles can be added here
           />
           <label htmlFor="file-upload-input">
-            <Button variant="contained" size="small" color="secondary" component="span">
+            <Button
+              variant="contained"
+              size="small"
+              color="secondary"
+              component="span"
+            >
               Select File
             </Button>
           </label>

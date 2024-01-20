@@ -1,18 +1,14 @@
 import { useSelector } from "react-redux";
-import Login from "../Login/Login";
 import CreateMachineData from "../Machine/CreateMachineData/CreateMachineData";
 import { useNavigate } from "react-router";
 import CircularProgressCentered from "../../UI/Loader/Loader";
+import { selectIsAuthenticated, selectUser } from "../../Store/Auth/AuthSelector";
+import { selectLoadingState } from "../../Store/Dashboard/DashboardSelector";
 
 const Home = () => {
-    const { user, isAuthenticated, isLoading } = useSelector((state: any) => {
-        // console.log(state);
-        return {
-            user: state.auth.user,
-            isAuthenticated: state.auth.isAuthenticated,
-            isLoading: state.dashboard.isLoading
-        }
-    })
+    const isLoading = useSelector(selectLoadingState);
+    const user = useSelector(selectUser);
+    const isAuthenticated = useSelector(selectIsAuthenticated)
     const navigate = useNavigate();
     if (user.isReadOnly) {
         navigate("/dashboard")

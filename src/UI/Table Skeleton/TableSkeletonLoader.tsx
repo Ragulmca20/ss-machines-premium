@@ -11,7 +11,6 @@ const TableWithSkeletonLoader: FC<SkeletonLoaderProps> = ({ row, column }) => {
     const columns = Array.from({ length: column }, (_, index) => index);
     return (<>
         {rows.map((row: number) => {
-            console.log(row)
             return (<TableRow key={row}>
                 {columns.map((column: number) => {
                     return <TableCell key={column}>
