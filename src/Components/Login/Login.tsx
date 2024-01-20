@@ -26,6 +26,8 @@ const Login: React.FC = () => {
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [isLoginFailed, setIsLoginFailed] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
     isAuthenticated && navigate("/");
@@ -34,6 +36,8 @@ const Login: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setEmailError("");
+    setPasswordError("");
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -41,6 +45,17 @@ const Login: React.FC = () => {
   };
 
   const handleLogin = async () => {
+    // Simple email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setEmailError("Invalid email address");
+      return;
+    }
+
+    // Simple password validation
+    if (formData.password.length < 8) {
+      setPasswordError("Password must be at least 8 characters");
+      return;
+    }
     dispatch(dashboardActions.setLoadingState(true));
 
     try {
@@ -71,7 +86,6 @@ const Login: React.FC = () => {
       setErrorMessage("Email id already exists please try to login");
       dispatch(dashboardActions.setLoadingState(false));
       setIsLoginFailed(true);
-      
     } finally {
       setFormData({ email: "", password: "" });
       dispatch(dashboardActions.setLoadingState(false));
@@ -96,6 +110,7 @@ const Login: React.FC = () => {
               id="email"
               label="Email Address"
               name="email"
+              error={Boolean(emailError)}
               autoComplete="email"
               autoFocus
               value={formData.email}
@@ -111,6 +126,7 @@ const Login: React.FC = () => {
               label="Password"
               type="password"
               id="password"
+              error={Boolean(passwordError)}
               autoComplete="current-password"
               value={formData.password}
               onChange={handleInputChange}
@@ -140,11 +156,13 @@ const Login: React.FC = () => {
             {isLogin ? "New user signup" : "Already have an account"}{" "}
           </Link>
           {/* Error Modal */}
-          {isLoginFailed && <ErrorModal
-            open={isLoginFailed}
-            onClose={handleCloseErrorModal}
-            errorMessage={errorMessage}
-          />}
+          {isLoginFailed && (
+            <ErrorModal
+              open={isLoginFailed}
+              onClose={handleCloseErrorModal}
+              errorMessage={errorMessage}
+            />
+          )}
         </Card>
       </Container>
     );
