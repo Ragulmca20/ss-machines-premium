@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../Firebase/user";
 import { selectUser } from "../Store/Auth/AuthSelector";
 import { Role, authActions } from "../Store/Auth/AuthSlice";
-import { dashboardActions } from "../Store/Dashboard/DashboardSlice";
 
 const PrivateRoute: FC<any> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -20,12 +19,10 @@ const PrivateRoute: FC<any> = ({ children }) => {
       setIsAuthenticated(false);
     }
     dispatch(authActions.saveUserData(userDetails));
-    dispatch(dashboardActions.setLoadingState(false));
   };
   
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      dispatch(dashboardActions.setLoadingState(true));
       if (authUser) {
         setIsAuthenticated(true);
         !id && getUserDetails(authUser.uid);

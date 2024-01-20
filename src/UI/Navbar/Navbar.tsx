@@ -9,6 +9,7 @@ import auth from "../../Firebase/firebase";
 import { Role, authActions } from "../../Store/Auth/AuthSlice";
 import { selectIsAuthenticated } from "../../Store/Admin/AdminSlice";
 import { selectUser } from "../../Store/Auth/AuthSelector";
+import { AppDispatch, resetRootState } from "../../Store/store";
 
 const navbarStyles: React.CSSProperties = {
   flexGrow: 1,
@@ -20,7 +21,7 @@ const linkStyles: React.CSSProperties = {
 };
 
 const Navbar: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
@@ -35,6 +36,7 @@ const Navbar: React.FC = () => {
   }, [dispatch, user.id]);
   const handleLogout = async () => {
     await signOut();
+    dispatch(resetRootState());
     dispatch(authActions.logout());
     navigate("/login");
   };

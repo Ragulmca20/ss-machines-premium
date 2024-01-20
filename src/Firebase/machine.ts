@@ -33,12 +33,11 @@ export const uploadfile = async (file: any) => {
   return await getDownloadURL(storageRef);
 };
 
-export const getMachineData = async (uid: string) => {
-  let id = "yjTwOtZU0QNgvz82wUSNv9F9VYk2";
+export const getMachineData = async (id: string) => {
   try {
     const q = query(
       collection(db, "users"),
-      where("id", "==", "yjTwOtZU0QNgvz82wUSNv9F9VYk2"),
+      where("id", "==", id),
       where("role", "==", Role.admin)
     );
     const user = await getDocs(q);

@@ -6,12 +6,10 @@ import { User } from "../Auth/AuthSlice";
 
 interface AdminState {
   users: User[];
-  isLoading?: boolean;
 }
 
 const initialState: AdminState = {
-  users: [],
-  isLoading: false,
+  users: []
 };
 
 const adminSlice = createSlice({
@@ -28,6 +26,9 @@ const adminSlice = createSlice({
           : user
       );
     },
+    resetAdminState: (state) => {
+      return initialState
+    }
   },
 });
 

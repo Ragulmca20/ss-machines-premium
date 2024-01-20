@@ -1,6 +1,6 @@
 // src/components/Login.tsx
-import React, { useState } from "react";
-import { Button, TextField, Typography, Modal, Link } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Button, TextField, Link } from "@mui/material";
 import { login, signOut, signup } from "../../Firebase/user";
 import Card from "../../UI/Card/Card";
 import Container from "../../UI/Container/Container";
@@ -10,6 +10,8 @@ import { dashboardActions } from "../../Store/Dashboard/DashboardSlice";
 import { useNavigate } from "react-router";
 import CircularProgressCentered from "../../UI/Loader/Loader";
 import { selectLoadingState } from "../../Store/Dashboard/DashboardSelector";
+import { selectIsAuthenticated } from "../../Store/Admin/AdminSlice";
+import ErrorModal from "../../UI/Error Modal/ErrorModal";
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -18,10 +20,17 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const isLoading = useSelector(selectLoadingState);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
   const dispatch = useDispatch();
 
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [isLoginFailed, setIsLoginFailed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    isAuthenticated && navigate("/");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,14 +48,10 @@ const Login: React.FC = () => {
         email: formData?.email,
         password: formData?.password,
       });
-
-      // const user = { uid: userCredential.user.uid };
-      // localStorage.setItem("user", JSON.stringify(user));
       dispatch(authActions.login());
-      // dispatch(authActions.saveUserData({ id: userCredential.user.uid }));
       navigate("/");
     } catch (error: { message: string } | any) {
-      console.error("Login error:", error?.message);
+      setErrorMessage("Invalid usernames or password please try again");
       dispatch(dashboardActions.setLoadingState(false));
       setIsLoginFailed(true);
     } finally {
@@ -61,18 +66,21 @@ const Login: React.FC = () => {
         email: formData?.email,
         password: formData?.password,
       });
+      navigate("/");
     } catch (error: any) {
+      setErrorMessage("Email id already exists please try to login");
+      dispatch(dashboardActions.setLoadingState(false));
       setIsLoginFailed(true);
-      console.error("Signup error:", error.message);
+      
     } finally {
       setFormData({ email: "", password: "" });
       dispatch(dashboardActions.setLoadingState(false));
-      navigate("/");
     }
   };
 
-  const handleCloseModal = () => {
+  const handleCloseErrorModal = () => {
     setIsLoginFailed(false);
+    setErrorMessage("");
   };
 
   const getLoginContainer = () => {
@@ -132,47 +140,11 @@ const Login: React.FC = () => {
             {isLogin ? "New user signup" : "Already have an account"}{" "}
           </Link>
           {/* Error Modal */}
-          <Modal
+          {isLoginFailed && <ErrorModal
             open={isLoginFailed}
-            onClose={handleCloseModal}
-            aria-labelledby="login-failure-modal"
-            aria-describedby="login-failure-description"
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                backgroundColor: "white",
-                padding: "20px",
-                textAlign: "center",
-              }}
-            >
-              <Typography variant="h6" id="login-failure-modal">
-                Login Failed
-              </Typography>
-
-              <Typography variant="body2" id="login-failure-description">
-                Your username or password is incorrect. Please try again.
-              </Typography>
-
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleCloseModal}
-                size="large"
-                style={{
-                  maxWidth: "50px",
-                  maxHeight: "50px",
-                  minWidth: "50px",
-                  minHeight: "50px",
-                }}
-              >
-                Close
-              </Button>
-            </div>
-          </Modal>
+            onClose={handleCloseErrorModal}
+            errorMessage={errorMessage}
+          />}
         </Card>
       </Container>
     );

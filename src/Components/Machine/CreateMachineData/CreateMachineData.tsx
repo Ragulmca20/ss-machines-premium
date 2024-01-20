@@ -27,7 +27,7 @@ const CreateMachineData: React.FC<CreateMachineDataProps> = () => {
         machineValue1: machineValue1,
         machineValue2: machineValue2,
         file,
-        userId: userId || "",
+        userId: userId,
       });
       dispatch(dashboardActions.setLoadingState(false));
     }
